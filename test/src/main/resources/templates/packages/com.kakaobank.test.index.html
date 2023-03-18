@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<head>
+<meta charset="UTF-8">
+<title>board write</title>
+<link rel="stylesheet" th:href="@{/css/style/css}"
+	  href="../../css/style.css"></link>
+</head>
+<body>
+
+<script type="text/javascript">
+$(function() {
+	$("search").click(function() {
+		
+		$.ajax({
+		    url:'/Search', 
+		    type:'post',
+		    dataType: "jsonp",
+		    async: false, 
+		    success: function(data) {
+		    	console.log(data);
+		    	
+		    	
+		    	
+		    	
+		    },
+		    error: function(err) {
+		    }
+		});
+		
+	});
+	
+	
+});
+
+
+
+
+
+
+</script>
+	<div class="container">
+		<h2>게시판 등록</h2>
+		<form id="frm" name="frm" method="post" action="/board/insertBoard.do" enctype=multipart/form-data>
+			<table class="board_detail">
+				<tr>
+					<td>제목</td>
+					<td><input type="text" id="title" name="title"></td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<textarea id="contents" name="contents"></textarea>	
+					</td>
+				</tr>
+			</table>
+			<input type="submit" id="search" value="검색" class="btn">
+		</form>
+	</div>
+	
+</body>
+</html>
