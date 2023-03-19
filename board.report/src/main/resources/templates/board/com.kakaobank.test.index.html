@@ -1,61 +1,97 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>search</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+<meta charset="UTF-8">
+<title>search</title>
+<link rel="stylesheet" th:href="@{/css/style.css}"/>
+<link rel="shortcut icon" href="#">
 </head>
 <body>
-    <div class="container">
-        <h2>블로그 검색</h2>
-        <table class="board_detail">
-            <tr>
-                <td>인기검색어</td>
+<div class="container">
+	<h2>인기 검색어</h2>
+	<table class="board_detail">
+	        <thead>
+            <tr style="text-align: left;">
+                <th>순위</th>
+                <th>검색어</th>
+                <th>조회수</th>
             </tr>
-            <tr>
-                <td>
-                    <input id="blogsearch" value="미국" type="text" size="40" class="input" >
-                    <input type="button" id="search" value="검색" class="btn">
-                    <input type="radio" name="sort" value="accuracy" checked> 정확도순
-   					<input type="radio" name="sort" value="recency"> 최신순
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p></p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div id="pagination"></div>
-                </td>
-            </tr>
-            
-        </table>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        </thead>
+	<tr th:if="${#lists.size(list)}> 0" th:each="list : ${list}">
+		<td th:text="${list.ranking}">
+		<td th:text="${list.title}">
+		</td>
+		<td th:text="${list.searchCount}">
+		</td>
+	</tr>
+	</table>
+	<h2>블로그 검색</h2>
+	<table class="board_detail">
+	<tr>
+		<td>
+			<input id="blogsearch" type="text" size="40" class="input">
+			<input type="button" id="search" value="검색" class="btn">
+			<input type="radio" name="sort" value="accuracy" checked> 정확도순 <input type="radio" name="sort" value="recency"> 최신순
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div id="pagination">
+			</div>
+		</td>
+	</tr>
+	</table>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script type="text/javascript">
     $(function() {
-        function performSearch(pageNumber) {
-            var $p = $("p");
-            $p.empty();
-            var sortValue = $('input[name="sort"]:checked').val();
+        $("#search").click(function() {
+            var blogsearchValue = $("#blogsearch").val();
+            sortValue = $('input[name="sort"]:checked').val();
+            localStorage.setItem("blogsearchValue", blogsearchValue); 
+            localStorage.setItem("sortValue", sortValue); 
             $.ajax({
-                method: 'GET',
-                url: 'https://dapi.kakao.com/v2/search/blog?', //url will be modified later
-                data: { query: $("#blogsearch").val(), sort: sortValue, page: pageNumber },
-                headers: { Authorization: "KakaoAK e81a5d0a03b6e4d20e128b3f8960dbd9" }, //Specific values ​​for access permission will be modified later
+                url: "Rank",
+                method: "POST",
+                data: {
+                    blogsearch:blogsearchValue,
+                    sort: sortValue
+                },
+                success: function(response) {
+                    console.log("Rank request success");
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+
+        displayValues();
+
+        function displayValues() {
+            $.ajax({
+                url: "test",
+                method: "POST",
+                data: {
+                    blogsearch:localStorage.getItem("blogsearchValue"),
+                    sort: localStorage.getItem("sortValue")
+                },
                 success: function(data) {
-                    var documents = data.documents; //first header later modified
-                    var pageableCount = data.meta.pageable_count;
-                    var currentPage = data.meta.is_end ? Math.ceil(pageableCount / 10) : data.meta.pageable_count / 10 + 1;
-
-
+                   var jsonObject = JSON.parse(data);
+                    console.log("여기맞냐?"+data);
+                    var documents = jsonObject.documents;
                     for (var i = 0; i < documents.length; i++) {
                         var keys = Object.keys(documents[i]);
                         for (var j = 0; j < keys.length; j++) {
                             var key = keys[j];
-                            if (key === "thumbnail") { //Picture url later modified
+                            if (key === "thumbnail") {
                                 $("p").append("<img src='" + documents[i][key] + "'/> <br>");
                             } else {
                                 $("p").append("<strong>" + key + ":</strong> " + documents[i][key] + "<br>");
@@ -63,52 +99,15 @@
                         }
                         $("p").append("<br>");
                     }
-                        
-                        var totalPages = Math.ceil(pageableCount / 10);
-                        var paginationHtml = '';
-                        for (var i = 1; i <= totalPages; i++) {
-                            paginationHtml += '<button class="page-button">' + i + '</button>';
-                        }
-                        $('#pagination').html(paginationHtml);
-                        
-                        // highlight current page button
-                        $('.page-button').eq(currentPage - 1).addClass('current-page');
-                       
-              
-                        
-                    },
-                    error: function(err) {
-                        console.log("API call failed");
-                    }
-                });
-            }
-                
-                $("#search").click(function() {
-                    performSearch(1);
-                    var blogsearchValue = $("#blogsearch").val();
-                    $.ajax({
-                      url: "Rank",
-                      method: "POST",
-                      data: { blogsearch: blogsearchValue },
-                      success: function(response) {
-                        console.log("Success: " + response);
-                      },
-                      error: function(xhr, status, error) {
-                        console.log("Error: " + error);
-                      }
-                    });
-                });
-
-                $('#pagination').on('click', '.page-button', function() {
-                    var pageNumber = $(this).text();
-                    console.log("Selected number: " + pageNumber);
-                    performSearch(pageNumber);
-                });
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error: " + error);
+                }
             });
-    
+        }
         
-        
- 
-    </script>
+        localStorage.clear();
+    });
+</script>
 </body>
 </html>
