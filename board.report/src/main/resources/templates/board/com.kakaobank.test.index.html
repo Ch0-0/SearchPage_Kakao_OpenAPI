@@ -9,22 +9,47 @@
 <body>
 <div class="container">
 	<h2>인기 검색어</h2>
-	<table class="board_detail">
-	        <thead>
-            <tr style="text-align: left;">
-                <th>순위</th>
-                <th>검색어</th>
-                <th>조회수</th>
-            </tr>
-        </thead>
-	<tr th:if="${#lists.size(list)}> 0" th:each="list : ${list}">
-		<td th:text="${list.ranking}">
-		<td th:text="${list.title}">
-		</td>
-		<td th:text="${list.searchCount}">
-		</td>
-	</tr>
-	</table>
+	<div id="content">
+		<table class="board_detail" id="firstRankList" >
+		        <thead>
+	            <tr style="text-align: left;">
+	                <th>순위</th>
+	                <th>검색어</th>
+	                <th>조회수</th>
+	            </tr>
+	        </thead>
+				<tr th:if="${#lists.size(list)}> 0" th:each="list : ${list}">
+					<td th:text="${list.ranking}">
+					<td th:text="${list.title}">
+					</td>
+					<td th:text="${list.searchCount}">
+					</td>
+				</tr>
+			
+		</table>
+		
+				<table class="board_detail"  id="secondRankList" style='display : none;'>
+		        <thead>
+	            <tr style="text-align: left;">
+	                <th>순위</th>
+	                <th>검색어</th>
+	                <th>조회수</th>
+	            </tr>
+	        </thead>
+				<tr>
+					<td>
+						<p id=rankNum></p>
+					</td>
+					<td>
+						<p id=rankTitle></p>
+					</td>
+					<td>
+						<p id=rankCnt></p>
+					</td>
+				</tr>
+			
+		</table>
+	</div>
 	<h2>블로그 검색</h2>
 	<table class="board_detail">
 	<tr>
@@ -36,7 +61,7 @@
 	</tr>
 	<tr>
 		<td>
-			<p>
+			<p id=apiList>
 			</p>
 		</td>
 	</tr>
@@ -50,10 +75,11 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script type="text/javascript">
-    $(function() {
+
         $("#search").click(function() {
         	sessionStorage.clear();
-        	
+        	$("#firstRankList").hide();
+        	$("#secondRankList").show();
             var blogsearchValue = $("#blogsearch").val();
             sortValue = $('input[name="sort"]:checked').val();
             sessionStorage.setItem("blogsearchValue", blogsearchValue); 
@@ -67,15 +93,50 @@
                 },
                 success: function(response) {
                     console.log("Rank request success");
-                    location.reload();
+                    rankList();
+                    displayValues();
                 },
                 error: function(xhr, status, error) {
                     console.log("Error: " + error);
                 }
             });
+            
+            
         });
+        
+        
+        function rankList() {
 
-        displayValues();
+            $.ajax({
+                url: "rankList",
+                method: "POST",
+                data: {
+                },
+                success: function(selectRL) {
+                    console.log("select rankList");
+                    var jsonArray = JSON.parse(selectRL); 
+                    $("#rankNum").empty();
+                    $("#rankTitle").empty();
+                    $("#rankCnt").empty();
+                    for (var i = 0; i < jsonArray.length; i++) {
+                        var obj = jsonArray[i];
+                        $("#rankNum").append( obj.ranking + "<br>");
+                        $("#rankTitle").append(obj.title + "<br>");
+                        $("#rankCnt").append(obj.searchCount + "<br>");
+                    //    $("#rankCnt").append("<br>");
+                        
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+            
+            
+        };
+        
+
+        
         
         function displayValues() {
             $.ajax({
@@ -94,18 +155,18 @@
                     var pageableCount = jsonObject.meta.pageable_count;
                     var currentPage = jsonObject.meta.is_end ? Math.ceil(pageableCount / 10) : jsonObject.meta.pageable_count / 10 + 1;
 
-                    
+                    $("#apiList").empty();
                     for (var i = 0; i < documents.length; i++) {
                         var keys = Object.keys(documents[i]);
                         for (var j = 0; j < keys.length; j++) {
                             var key = keys[j];
                             if (key === "thumbnail") {
-                                $("p").append("<img src='" + documents[i][key] + "'/> <br>");
+                                $("#apiList").append("<img src='" + documents[i][key] + "'/> <br>");
                             } else {
-                                $("p").append("<strong>" + key + ":</strong> " + documents[i][key] + "<br>");
+                                $("#apiList").append("<strong>" + key + ":</strong> " + documents[i][key] + "<br>");
                             }
                         }
-                        $("p").append("<br>");
+                        $("#apiList").append("<br>");
                     }
                     
                     
@@ -132,13 +193,11 @@
             console.log("Selected number: " + pageNumber);
     
             sessionStorage.setItem("pageNumber", pageNumber); 
-            $("p").empty();
+
             displayValues();
         });
         
-        
-    });
-    
+
 </script>
 </body>
 </html>

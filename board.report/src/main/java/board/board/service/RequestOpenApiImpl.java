@@ -15,10 +15,10 @@ import com.google.gson.JsonObject;
 
 
 @Service
-public class SearchApi {
+public class RequestOpenApiImpl implements RequestOpenApi{
 	
 
-    public JsonObject Search(String blogsearch,String sortValue, String pageNumber) {
+    public JsonObject Kakao_api(String blogsearch,String sortValue, String pageNumber) throws Exception {
         String clientSecret = "e81a5d0a03b6e4d20e128b3f8960dbd9";
         JsonObject jsonObject = null;
         try {
@@ -61,4 +61,11 @@ public class SearchApi {
         
         return jsonObject;
     }
+
+
+	@Override
+	public JsonObject naver_api() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

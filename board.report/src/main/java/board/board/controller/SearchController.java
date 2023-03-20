@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import board.board.dto.RankDto;
-import board.board.service.SearchApi;
+import board.board.service.RequestOpenApi;
 import board.board.service.SearchService;
 
 //스프링 MVC컨트롤러
@@ -23,15 +24,24 @@ public class SearchController {
 	private SearchService searchService;
 	
 	@Autowired
-	private SearchApi searchApi;
+	private RequestOpenApi requestOpenApi;
 
 	@RequestMapping("/")
 	public ModelAndView index(RankDto rank) throws Exception {
 		ModelAndView mv = new ModelAndView("/board/com.kakaobank.test.index.html");
 		List<RankDto> list = searchService.selectBoardList(rank);
 		mv.addObject("list", list); //List
-		
 		return mv;
+	}
+	
+	@RequestMapping("/rankList")
+	public @ResponseBody String rankList() throws Exception {
+		List<RankDto> list = searchService.selectBoardList();
+        
+        String json = new Gson().toJson(list);
+        
+        return json;
+
 	}
 	
 	@RequestMapping("/test")
@@ -41,7 +51,8 @@ public class SearchController {
 			return null;
 		}
 		
-	    JsonObject jsonObject = searchApi.Search(blogsearch,sortValue,pageNumber);
+	    JsonObject jsonObject = requestOpenApi.Kakao_api(blogsearch,sortValue,pageNumber);
+
 	    
 	    return jsonObject.toString();
 	}
@@ -56,6 +67,7 @@ public class SearchController {
 //	}
 
 
+	//검색단어 랭킹을 조회하는 서비스 호출
 	@RequestMapping("/Rank")
 	public @ResponseBody ModelAndView method(@RequestParam("blogsearch") String blogsearch) throws Exception {
 		
@@ -64,8 +76,7 @@ public class SearchController {
 		if(blogsearch.length()==0) {
 			return mv;
 		}
-		
-		//검색단어 랭킹을 조회하는 서비스 호출 (파라미터 값으로 검색명을 던져줘야됨)
+
 		RankDto rank = new RankDto();
 		rank.setTitle(blogsearch);
 		searchService.saveTitleCnt(rank);

@@ -33,7 +33,7 @@
 	
 
 	
-	<update id="insertTitle" parameterType="string">
+	<insert id="insertTitle" parameterType="string">
 		<![CDATA[
 		INSERT INTO RANK
 			(
@@ -46,7 +46,7 @@
 		   , 1
 			)
 		]]>
-	</update>
+	</insert>
 	
 
 	
