@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>search</title>
 <link rel="stylesheet" th:href="@{/css/style.css}"/>
 <link rel="shortcut icon" href="#">
@@ -19,37 +19,31 @@
 	            </tr>
 	        </thead>
 				<tr th:if="${#lists.size(list)}> 0" th:each="list : ${list}">
-					<td th:text="${list.ranking}">
-					<td th:text="${list.title}">
-					</td>
-					<td th:text="${list.searchCount}">
-					</td>
+					<td th:text="${list.ranking}"></td>
+					<td th:text="${list.title}"></td>				
+					<td th:text="${list.searchCount}"></td>
 				</tr>
 			
 		</table>
-		
-				<table class="board_detail"  id="secondRankList" style='display : none;'>
-		        <thead>
+	</div>
+	<div>	
+		<table class="board_detail"  id="secondRankList" style='display : none;'>
+		    <thead>
 	            <tr style="text-align: left;">
 	                <th>순위</th>
 	                <th>검색어</th>
 	                <th>조회수</th>
 	            </tr>
 	        </thead>
-				<tr>
-					<td>
-						<p id=rankNum></p>
-					</td>
-					<td>
-						<p id=rankTitle></p>
-					</td>
-					<td>
-						<p id=rankCnt></p>
-					</td>
-				</tr>
+				<tbody id=secondRankList2>
+
+				</tbody>
 			
 		</table>
 	</div>
+
+
+
 	<h2>블로그 검색</h2>
 	<table class="board_detail">
 	<tr>
@@ -115,17 +109,19 @@
                 success: function(selectRL) {
                     console.log("select rankList");
                     var jsonArray = JSON.parse(selectRL); 
-                    $("#rankNum").empty();
-                    $("#rankTitle").empty();
-                    $("#rankCnt").empty();
+                    var html='';
                     for (var i = 0; i < jsonArray.length; i++) {
                         var obj = jsonArray[i];
-                        $("#rankNum").append( obj.ranking + "<br>");
-                        $("#rankTitle").append(obj.title + "<br>");
-                        $("#rankCnt").append(obj.searchCount + "<br>");
-                    //    $("#rankCnt").append("<br>");
-                        
+
+                        html +='<tr>';
+                        html +='<td>'+obj.ranking+'</td>';
+                        html +='<td>'+obj.title+'</td>';
+                        html +='<td>'+obj.searchCount+'</td>';
+                        html +='</tr>';
                     }
+                    
+                    $("#secondRankList2").empty();
+                    $("#secondRankList2").append(html);
                 },
                 error: function(xhr, status, error) {
                     console.log("Error: " + error);
@@ -140,16 +136,20 @@
         
         function displayValues() {
             $.ajax({
-                url: "test",
+                url: "requestApi",
                 method: "POST",
                 data: {
                     blogsearch:sessionStorage.getItem("blogsearchValue"),
                     sort: sessionStorage.getItem("sortValue"),
                     page: sessionStorage.getItem("pageNumber")
                 },
-              //  dataType: "json",
                 success: function(data) {
-                	console.log("Json: "+data);
+                	console.log("returnApiJsonMessage: "+data);
+                	if(data==null || data==''){
+                		console.log("No search data");
+                		alert("검색어를 입력해주세요.");
+                		return;
+                	}
                     var jsonObject = JSON.parse(data); 
                     var documents = jsonObject.documents;
                     var pageableCount = jsonObject.meta.pageable_count;

@@ -9,8 +9,6 @@ import java.net.URLEncoder;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -22,8 +20,10 @@ public class RequestOpenApiImpl implements RequestOpenApi{
         String clientSecret = "e81a5d0a03b6e4d20e128b3f8960dbd9";
         JsonObject jsonObject = null;
         try {
-            String keyword = URLEncoder.encode(blogsearch, "UTF-8");
-            String apiURL = "https://dapi.kakao.com/v2/search/blog?query=" + keyword + "&sort=" + sortValue +"&page=" + pageNumber;
+        	String titleword = URLEncoder.encode(blogsearch, "UTF-8");
+        	String sortword = URLEncoder.encode(sortValue, "UTF-8");
+        	String pageword = URLEncoder.encode(pageNumber, "UTF-8");
+            String apiURL = "https://dapi.kakao.com/v2/search/blog?query=" + titleword + "&sort=" + sortword +"&page=" + pageword;
 
             URL url = new URL(apiURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -47,9 +47,7 @@ public class RequestOpenApiImpl implements RequestOpenApi{
 //               String title = document.getAsJsonObject().get("blogname").getAsString();
 //               System.out.println(title);
 //           }
-            
-    
-             //페이징 하려다가 맘
+
 //             JsonObject metaObject = jsonObject.getAsJsonObject("meta");
 //             String pageableCount = metaObject.get("pageable_count").getAsString();
 //             System.out.println(pageableCount);

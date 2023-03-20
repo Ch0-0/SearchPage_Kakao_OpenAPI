@@ -5,6 +5,34 @@ plugins {
 	id 'war'
 }
 
+jar {
+
+    baseName = "homepage-batch"
+
+    version = "0.0.1-SNAPSHOT"
+
+    manifest {
+
+        attributes 'Title': 'Reqeust And Header Tester',
+
+                   'Version': 1.0,
+
+                   'Main-Class': 'board.BoardApplication'
+
+    }
+
+    from {
+
+        configurations.compile.collect {
+
+            it.isDirectory() ? it : zipTree(it)
+
+        }
+
+    }
+
+}
+
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'

@@ -27,9 +27,9 @@ public class SearchController {
 	private RequestOpenApi requestOpenApi;
 
 	@RequestMapping("/")
-	public ModelAndView index(RankDto rank) throws Exception {
-		ModelAndView mv = new ModelAndView("/board/com.kakaobank.test.index.html");
-		List<RankDto> list = searchService.selectBoardList(rank);
+	public ModelAndView index() throws Exception {
+		ModelAndView mv = new ModelAndView("./board/com.kakaobank.test.index.html");
+		List<RankDto> list = searchService.selectBoardList();
 		mv.addObject("list", list); //List
 		return mv;
 	}
@@ -44,34 +44,27 @@ public class SearchController {
 
 	}
 	
-	@RequestMapping("/test")
+	@RequestMapping("/requestApi")
 	public @ResponseBody String test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue, @RequestParam("page") String pageNumber) throws Exception {
-		
+
 		if(blogsearch.length()==0) {
 			return null;
 		}
 		
 	    JsonObject jsonObject = requestOpenApi.Kakao_api(blogsearch,sortValue,pageNumber);
 
-	    
 	    return jsonObject.toString();
 	}
 
 	
-//	@RequestMapping("/test")
-//	public @ResponseBody JsonObject test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue) throws Exception {
-//		
-//	    JsonObject jsonObject = searchApi.Search("미국", "accuracy");
-//	    
-//	    return jsonObject;
-//	}
+
 
 
 	//검색단어 랭킹을 조회하는 서비스 호출
 	@RequestMapping("/Rank")
 	public @ResponseBody ModelAndView method(@RequestParam("blogsearch") String blogsearch) throws Exception {
 		
-		ModelAndView mv = new ModelAndView("/board/com.kakaobank.test.index.html"); 
+		ModelAndView mv = new ModelAndView("./board/com.kakaobank.test.index.html"); 
 		
 		if(blogsearch.length()==0) {
 			return mv;
@@ -80,12 +73,7 @@ public class SearchController {
 		RankDto rank = new RankDto();
 		rank.setTitle(blogsearch);
 		searchService.saveTitleCnt(rank);
-		
-//		JsonObject jsonObject = searchApi.Search("미국","accuracy");
-//		String JOstr = jsonObject.toString();
-//
-//		// API호출
-//		mv.addObject("jsonObject", jsonObject);
+
 		
 		return mv;
 
