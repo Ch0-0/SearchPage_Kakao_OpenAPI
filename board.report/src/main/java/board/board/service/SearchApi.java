@@ -19,10 +19,6 @@ public class SearchApi {
 	
 
     public JsonObject Search(String blogsearch,String sortValue) {
-    	if(blogsearch.length()==0) {
-    		System.out.println("아직 입력안했어!!");
-			return null;
-		}
         String clientSecret = "e81a5d0a03b6e4d20e128b3f8960dbd9";
         JsonObject jsonObject = null;
         try {
@@ -46,13 +42,18 @@ public class SearchApi {
             Gson gson = new Gson();
              jsonObject = gson.fromJson(response.toString(), JsonObject.class);
 
-            System.out.println(jsonObject);
-//            JsonArray documents = jsonObject.getAsJsonArray("documents");
-//
-//            for (JsonElement document : documents) {
-//                String title = document.getAsJsonObject().get("blogname").getAsString();
-//                System.out.println(title);
-//            }
+//           jsonObject = jObject.getJSONObject("post1")  
+//           for (JsonElement document : documents) {
+//               String title = document.getAsJsonObject().get("blogname").getAsString();
+//               System.out.println(title);
+//           }
+            
+    
+             
+             JsonObject metaObject = jsonObject.getAsJsonObject("meta");
+             String pageableCount = metaObject.get("pageable_count").getAsString();
+             System.out.println(pageableCount);
+
             
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

@@ -83,9 +83,10 @@
                     blogsearch:localStorage.getItem("blogsearchValue"),
                     sort: localStorage.getItem("sortValue")
                 },
+              //  dataType: "json",
                 success: function(data) {
-                   var jsonObject = JSON.parse(data);
-                    console.log("여기맞냐?"+data);
+                	console.log("Json: "+data);
+                   var jsonObject = JSON.parse(data); 
                     var documents = jsonObject.documents;
                     for (var i = 0; i < documents.length; i++) {
                         var keys = Object.keys(documents[i]);
@@ -101,7 +102,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log("Error: " + error);
+                    console.log("ApiFail_Error: " + error);
                 }
             });
         }

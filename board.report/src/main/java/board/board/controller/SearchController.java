@@ -37,10 +37,24 @@ public class SearchController {
 	@RequestMapping("/test")
 	public @ResponseBody String test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue) throws Exception {
 		
+		if(blogsearch.length()==0) {
+			return null;
+		}
+		
 	    JsonObject jsonObject = searchApi.Search(blogsearch,sortValue);
 	    
 	    return jsonObject.toString();
 	}
+
+	
+//	@RequestMapping("/test")
+//	public @ResponseBody JsonObject test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue) throws Exception {
+//		
+//	    JsonObject jsonObject = searchApi.Search("미국", "accuracy");
+//	    
+//	    return jsonObject;
+//	}
+
 
 	@RequestMapping("/Rank")
 	public @ResponseBody ModelAndView method(@RequestParam("blogsearch") String blogsearch) throws Exception {
@@ -56,11 +70,11 @@ public class SearchController {
 		rank.setTitle(blogsearch);
 		searchService.saveTitleCnt(rank);
 		
-		JsonObject jsonObject = searchApi.Search("미국","accuracy");
+//		JsonObject jsonObject = searchApi.Search("미국","accuracy");
 //		String JOstr = jsonObject.toString();
 //
 //		// API호출
-		mv.addObject("jsonObject", jsonObject);
+//		mv.addObject("jsonObject", jsonObject);
 		
 		return mv;
 
