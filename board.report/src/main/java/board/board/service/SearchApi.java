@@ -18,12 +18,12 @@ import com.google.gson.JsonObject;
 public class SearchApi {
 	
 
-    public JsonObject Search(String blogsearch,String sortValue) {
+    public JsonObject Search(String blogsearch,String sortValue, String pageNumber) {
         String clientSecret = "e81a5d0a03b6e4d20e128b3f8960dbd9";
         JsonObject jsonObject = null;
         try {
             String keyword = URLEncoder.encode(blogsearch, "UTF-8");
-            String apiURL = "https://dapi.kakao.com/v2/search/blog?query=" + keyword + "&sort=" + sortValue;
+            String apiURL = "https://dapi.kakao.com/v2/search/blog?query=" + keyword + "&sort=" + sortValue +"&page=" + pageNumber;
 
             URL url = new URL(apiURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -49,10 +49,10 @@ public class SearchApi {
 //           }
             
     
-             
-             JsonObject metaObject = jsonObject.getAsJsonObject("meta");
-             String pageableCount = metaObject.get("pageable_count").getAsString();
-             System.out.println(pageableCount);
+             //페이징 하려다가 맘
+//             JsonObject metaObject = jsonObject.getAsJsonObject("meta");
+//             String pageableCount = metaObject.get("pageable_count").getAsString();
+//             System.out.println(pageableCount);
 
             
         } catch (Exception e) {

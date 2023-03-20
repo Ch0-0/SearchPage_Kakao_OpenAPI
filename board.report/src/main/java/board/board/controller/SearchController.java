@@ -35,13 +35,13 @@ public class SearchController {
 	}
 	
 	@RequestMapping("/test")
-	public @ResponseBody String test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue) throws Exception {
+	public @ResponseBody String test(@RequestParam("blogsearch") String blogsearch, @RequestParam("sort") String sortValue, @RequestParam("page") String pageNumber) throws Exception {
 		
 		if(blogsearch.length()==0) {
 			return null;
 		}
 		
-	    JsonObject jsonObject = searchApi.Search(blogsearch,sortValue);
+	    JsonObject jsonObject = searchApi.Search(blogsearch,sortValue,pageNumber);
 	    
 	    return jsonObject.toString();
 	}

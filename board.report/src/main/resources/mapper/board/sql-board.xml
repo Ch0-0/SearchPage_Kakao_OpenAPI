@@ -12,12 +12,13 @@
 	
 	<select id="selectTitleList" resultType="board.board.dto.RankDto">
 		<![CDATA[
-			SELECT ROW_NUMBER() OVER (ORDER BY SEARCH_COUNT DESC) AS RANKING
-      			 , TITLE
-                 , SEARCH_COUNT
-              FROM RANK
-             ORDER BY SEARCH_COUNT DESC	 
-             LIMIT 10
+			SELECT ROW_NUMBER() OVER (ORDER BY SEARCH_COUNT DESC, TITLE) AS RANKING
+				 , TITLE
+				 , SEARCH_COUNT 
+			  FROM RANK 
+			 ORDER BY SEARCH_COUNT DESC
+			 	 , TITLE
+			 LIMIT 10
 		]]>
 	</select>
 	

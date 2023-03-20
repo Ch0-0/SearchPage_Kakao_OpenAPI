@@ -52,10 +52,12 @@
 <script type="text/javascript">
     $(function() {
         $("#search").click(function() {
+        	sessionStorage.clear();
+        	
             var blogsearchValue = $("#blogsearch").val();
             sortValue = $('input[name="sort"]:checked').val();
-            localStorage.setItem("blogsearchValue", blogsearchValue); 
-            localStorage.setItem("sortValue", sortValue); 
+            sessionStorage.setItem("blogsearchValue", blogsearchValue); 
+            sessionStorage.setItem("sortValue", sortValue); 
             $.ajax({
                 url: "Rank",
                 method: "POST",
@@ -74,20 +76,25 @@
         });
 
         displayValues();
-
+        
         function displayValues() {
             $.ajax({
                 url: "test",
                 method: "POST",
                 data: {
-                    blogsearch:localStorage.getItem("blogsearchValue"),
-                    sort: localStorage.getItem("sortValue")
+                    blogsearch:sessionStorage.getItem("blogsearchValue"),
+                    sort: sessionStorage.getItem("sortValue"),
+                    page: sessionStorage.getItem("pageNumber")
                 },
               //  dataType: "json",
                 success: function(data) {
                 	console.log("Json: "+data);
-                   var jsonObject = JSON.parse(data); 
+                    var jsonObject = JSON.parse(data); 
                     var documents = jsonObject.documents;
+                    var pageableCount = jsonObject.meta.pageable_count;
+                    var currentPage = jsonObject.meta.is_end ? Math.ceil(pageableCount / 10) : jsonObject.meta.pageable_count / 10 + 1;
+
+                    
                     for (var i = 0; i < documents.length; i++) {
                         var keys = Object.keys(documents[i]);
                         for (var j = 0; j < keys.length; j++) {
@@ -100,6 +107,19 @@
                         }
                         $("p").append("<br>");
                     }
+                    
+                    
+                    var totalPages = Math.ceil(pageableCount / 10);
+                    var paginationHtml = '';
+                    if(totalPages>50){
+                    	totalPages=50;
+                    }
+                    for (var i = 1; i <= totalPages; i++) {
+                        paginationHtml += '<button class="page-button">' + i + '</button>';
+                    }
+                    $('#pagination').html(paginationHtml);
+                    // highlight current page button
+                    $('.page-button').eq(currentPage - 1).addClass('current-page');
                 },
                 error: function(xhr, status, error) {
                     console.log("ApiFail_Error: " + error);
@@ -107,8 +127,18 @@
             });
         }
         
-        localStorage.clear();
+        $('#pagination').on('click', '.page-button', function() {
+            var pageNumber = $(this).text();
+            console.log("Selected number: " + pageNumber);
+    
+            sessionStorage.setItem("pageNumber", pageNumber); 
+            $("p").empty();
+            displayValues();
+        });
+        
+        
     });
+    
 </script>
 </body>
 </html>
