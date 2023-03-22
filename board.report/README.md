@@ -13,10 +13,9 @@
 ./gradlew build
 ```
 
-- **실행방법 (board.report/build/libs 폴더로 이동)**
-
+- **실행방법 (구글드라이브에서Jar파일 다운로드)**
+URL: https://drive.google.com/file/d/1lxTCom-pjx4_utgFEqqNKUGhatOVXS3I/view?usp=share_link
 ```
-cd build/libs
 java -jar board.report-0.0.1-SNAPSHOT.jar
 ```
 
