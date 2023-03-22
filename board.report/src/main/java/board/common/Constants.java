@@ -5,7 +5,7 @@ public final class Constants {
 
 	//카카오 RequestProperty
 	public static final String Kakao_URL_INFO = "https://dapi.kakao.com/v2/search/blog?";
-	public static final String Kakao_CLIENT_SECRET = "KakaoAK for fail";
+	public static final String Kakao_CLIENT_SECRET = "KakaoAK e81a5d0a03b6e4d20e128b3f8960dbd9";
 	public static final String Kakao_URL_CONDITION_1 = "&sort=";
 	public static final String Kakao_URL_CONDITION_2 = "&page=";
 	
