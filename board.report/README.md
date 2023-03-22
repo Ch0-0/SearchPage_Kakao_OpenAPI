@@ -20,7 +20,7 @@ URL: https://drive.google.com/file/d/1lxTCom-pjx4_utgFEqqNKUGhatOVXS3I/view?usp=
 java -jar board.report-0.0.1-SNAPSHOT.jar
 ```
 
-- **URL**
+- **실행URL**
 ```
 http://localhost:9080/
 ```
