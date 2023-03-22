@@ -14,10 +14,17 @@
 ```
 
 - **실행방법 (구글드라이브에서Jar파일 다운로드)**
+
 URL: https://drive.google.com/file/d/1lxTCom-pjx4_utgFEqqNKUGhatOVXS3I/view?usp=share_link
 ```
 java -jar board.report-0.0.1-SNAPSHOT.jar
 ```
+
+- **URL**
+```
+http://localhost:9080/
+```
+
 
 - **H2데이터베이스 접근정보 (application.properties에 정의)**
 
