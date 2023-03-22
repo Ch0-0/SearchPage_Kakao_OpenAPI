@@ -3,6 +3,7 @@ package board.board.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import board.board.dto.RankDto;
 import board.board.mapper.SearchMapper;
 
 @Service
-public class SearchServiceImpl implements SearchService {
+public class SearchRankImpl implements SearchRank {
 
 	@Autowired
 	private SearchMapper searchMapper;

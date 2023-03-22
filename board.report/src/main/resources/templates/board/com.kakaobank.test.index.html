@@ -55,7 +55,7 @@
 	</tr>
 	<tr>
 		<td>
-			<p id=apiList>
+			<p id="apiList">
 			</p>
 		</td>
 	</tr>
@@ -75,6 +75,7 @@
         	$("#firstRankList").hide();
         	$("#secondRankList").show();
             var blogsearchValue = $("#blogsearch").val();
+     
             sortValue = $('input[name="sort"]:checked').val();
             sessionStorage.setItem("blogsearchValue", blogsearchValue); 
             sessionStorage.setItem("sortValue", sortValue); 
@@ -94,6 +95,12 @@
                     console.log("Error: " + error);
                 }
             });
+            
+           	if(blogsearchValue===null || blogsearchValue===''){
+        		console.log("No search title data");
+        		alert("검색어를 입력해 주십시오.");
+        		return;
+        	}
             
             
         });
@@ -135,6 +142,7 @@
         
         
         function displayValues() {
+        	
             $.ajax({
                 url: "requestApi",
                 method: "POST",
@@ -144,25 +152,55 @@
                     page: sessionStorage.getItem("pageNumber")
                 },
                 success: function(data) {
+                	var jsonObject = JSON.parse(data);
+                	var api=null;
+                	var documents =null;
+                	var pageableCount = null;
+                	var imageKey=null;
+                	var currentPage =null;
+                	
+                	var divideKakaoOrNaver = data.substr(0, 11);
+                	if(divideKakaoOrNaver==="{\"documents"){
+                		api="kakao";
+                		console.log("responsForKakaoApi");
+                		documents = jsonObject.documents;
+                		pageableCount = jsonObject.meta.pageable_count;
+                		imageKey="thumbnail";
+                		currentPage = jsonObject.meta.is_end ? Math.ceil(pageableCount / 10) : pageableCount / 10 + 1;
+                		console.log("check:::::::::::::::::::"+documents);
+                	}else if(divideKakaoOrNaver==="{\"lastBuild"){
+                		api="naver";
+                		console.log("responsForNaverApi");
+                		documents = jsonObject.items;
+                		pageableCount = jsonObject.total;
+                		imageKey="link";
+                		currentPage = pageableCount / 10 + 1;
+                		alert("카카오에서 검색을 실패하여 네이버에서 검색하였습니다.");
+                	}
+
+
                 	console.log("returnApiJsonMessage: "+data);
-                	if(data==null || data==''){
+                	if(pageableCount===0){
                 		console.log("No search data");
-                		alert("검색어를 입력해주세요.");
+                		alert("조회된 블로그가 없습니다.");
+                		 $("#apiList").empty();
+                		 $('#pagination').empty();
                 		return;
                 	}
-                    var jsonObject = JSON.parse(data); 
-                    var documents = jsonObject.documents;
-                    var pageableCount = jsonObject.meta.pageable_count;
-                    var currentPage = jsonObject.meta.is_end ? Math.ceil(pageableCount / 10) : jsonObject.meta.pageable_count / 10 + 1;
-
+                	
+                	
                     $("#apiList").empty();
                     for (var i = 0; i < documents.length; i++) {
+                    	console.log(documents.length);
                         var keys = Object.keys(documents[i]);
                         for (var j = 0; j < keys.length; j++) {
                             var key = keys[j];
-                            if (key === "thumbnail") {
+                            if (key === imageKey && api==="kakao") {
                                 $("#apiList").append("<img src='" + documents[i][key] + "'/> <br>");
-                            } else {
+                            }else if(key === imageKey && api ==="naver"){
+                            	$("#apiList").append("<strong><a href=\"" + documents[i][key] + "\">" + "블로그 바로가기" + ":</a> </strong> " + documents[i][key] + "<br>");
+                            }
+                            else {
                                 $("#apiList").append("<strong>" + key + ":</strong> " + documents[i][key] + "<br>");
                             }
                         }
