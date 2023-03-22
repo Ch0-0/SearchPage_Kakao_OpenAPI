@@ -61,7 +61,7 @@ public class SearchController {
 	 * return jsonObject.toString(); }
 	 */
 
-	// To-Be 확장성을 고려하여 다시 개발중
+	// To-Be 확장성을 고려하여 다시 개발
 	@RequestMapping("/requestApi")
 	public @ResponseBody String test(@RequestParam("blogsearch") String blogsearch,
 			@RequestParam("sort") String sortValue, @RequestParam("page") String pageNumber) throws Exception {
@@ -86,6 +86,7 @@ public class SearchController {
 			apiType = "naver";
 			jsonObject = apiCaller.callApi(apiType, params);
 		}
+		System.out.println("jsonObjjsonObjectjsonObjectjsonObjectect"+jsonObject);
 		return jsonObject.toString();
 	}
 

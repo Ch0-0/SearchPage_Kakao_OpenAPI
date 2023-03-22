@@ -31,11 +31,12 @@ http://localhost:9080/h2-console
 
 - 테이블 구성의 경우 RanK 테이블로 구성하여 검색어에 대한 카운트 정보를 담아줬습니다. data.sql과 schema.sql을 이용하여 서버 실행 시 자동으로 테이블 생성과 sample 데이터를 넣어줬습니다.
 - HTML - Controller - Service - ServiceImpl - Mapper 형식으로 설계하였으며 보안을 위해 POST방식을 기본으로 하였습니다. 또한 HTML에서 웹 페이지를 빠르게 로드하고 동적으로 사용할 수 있게 Ajax를 사용했습니다. 시작되는 localhost:9080/ 을 기본으로 맵핑을 해주어 추가적으로 호출하는 url을 직접 입력하지 않도록  구성하여 개발과 테스트를 진행했습니다.
+- 추후 확장성을 위해 다중상속을 했습니다.  공통 인터페이스(SearchApi.java)를 정의하여 API의 추가,수정이 용이하도록 했습니다.
 - HTML에서 페이징 이동의 경우 검색했던 값을 기록하기 위해 메모리에 저장하였으며 일시적으로만 보관하기 위해 localStorage이 아닌 sessionStorage로 저장하였습니다.
 - Controller에서 예외처리를 할 경우 CRUD시에 일부만 commit이 될 수 있기 때문에 service에서 예외처리 했습니다.
 - 인기검색어의 경우 처음 페이지를 기동 하면서 보이도록 하였고 검색을 할 때 갱신되도록 하였습니다. 기록버튼 하나로 기록경신과 블로그검색을 같이 할 수 있도록 구성했습니다.
 
-
+- 카카오API의 호출 실패시 네이버API를 호출 하도록 구성하고 사용자에게는 네이버에서 조회했다고 팝업창을 통해 알려줬습니다. (카카오블로그 검색 시스템이라는 가정)
 
 
 
@@ -77,7 +78,7 @@ http://localhost:9080/h2-console
 
    1-4. **추후 새로운 API 추가 고려**
 
-   - 추후에 새로운 API 추가된다면 Constants.java에 설정된 전역변수의 값을 수정하여 빠르게 적용할 수 있도록 구성했습니다. 또한 MVC방식이기 때문에 추가되는 API에 대해서만 생성하여 추가 적용을 할 수 있도록 했습니다.
+   - 추후에 새로운 API 추가된다면 Constants.java에 설정된 전역변수의 값을 수정하여 빠르게 적용할 수 있도록 구성했습니다. 또한 공통 인터페이스(SearchApi.java)를 통해 카카오API와 네이버API를 추가했습니다. ApiColler.java에서 타입에 따라 API가 선택되도록 했습니다.
 
    
 
@@ -117,6 +118,8 @@ http://localhost:9080/h2-console
 
 - 조회버튼을 눌러 인기검색어를 호출할 경우에 해당 데이터가 DB에 있는지 확인합니다. 이미 있다면 조회수를 1 증가시켜주고 없다면 DB에 insert 시켜주고 조회수 1로 저장합니다.
 
+- DB의 검색어의 데이터형이 varchar(50) 이기 때문에 50보다 클경우 50까지만 잘라서 보내도록 했습니다.
+
 - DB에 데이터가 존재하는지 확인
 
   ```
@@ -155,7 +158,6 @@ http://localhost:9080/h2-console
   	</update>
   ```
   
-
 - 데이터가 없을 경우
 
   ```
@@ -174,3 +176,26 @@ http://localhost:9080/h2-console
   		]]>
   	</insert>
   ```
+
+​	3. **카카오API 호출 실패**
+
+- 카카오API 호출 실패시 컨트롤에서 타입에 naver를 담아 apiCaller를 호출했습니다. 키값의 명칭이 상이하여 네이버API호출 서비스단에서 명칭을 변경하여 호출하고 JSON 메시지를 return했습니다.
+- 응답된 Key값의 명칭도 다르기 때문에 화면에 보여주기전 응답받은 ajax에서 메시지의 앞부분에 따라 카카오API의 응답메시지인지 네이버API의 응답메시지인지 구분해주었습니다.
+
+- 예시 Test
+
+  Constants.java
+
+  ```
+  public static final String Kakao_CLIENT_SECRET = "KakaoAK e81a5d0a03b6e4d20e128b3f8960dbd9";
+  ->
+  public static final String Kakao_CLIENT_SECRET = "KakaoAK for fail";
+  ```
+
+- Response
+
+  ```
+  {"lastBuildDate":"Wed, 22 Mar 2023 22:08:52 +0900","total":4,"start":1,"display":4,"items":[{"title":"<b>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</b>","link":"https://blog.naver.com/jiyonii/130050266903","description":"","bloggername":"jiyonii님의 블로그","bloggerlink":"blog.naver.com/jiyonii","postdate":"20060412"},{"title":"제주도여행 셋째날 / 공천포 게스트하우스 / 공천포 앞바다... ","link":"https://blog.naver.com/subin0718/10180263411","description":"두준두준 설리서리 +.+ <b>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</b> 저긴 또 뭘주는거야 입술빨대를 이용해 흡입중인 미숙씨. // 안묵는다며~ 가기 싫다며~~ 뭔 회냐며~~~~ ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ... ","bloggername":"Hi! there :)","bloggerlink":"blog.naver.com/subin0718","postdate":"20131120"},{"title":"(AC) 사무라이 쇼다운 4 공략","link":"https://jkimgametips.tistory.com/377","description":"AB <b>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</b> 아마쿠사 아마쿠사 - 수라 오우마가토키 전 ↓↘→ + D 오우마가토키 후 ↓↙← + D 사령인 ↓↘→ + 베기 그대, 암전입멸하라 →↓↘ + 베기(상승), 베기... ","bloggername":"G.A.M.E == GAME","bloggerlink":"https://jkimgametips.tistory.com/","postdate":"20180521"},{"title":"[박지성 골 해외-현지팬반응] 리그 2호/시즌 4호 골 실황반응","link":"https://blog.naver.com/dokdo_han/100115990098","description":"Mainoldo Thank fuck for PARK Ole's_toe_poke Parrrrrrrrrrrrrrrkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk <b>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</b> <b>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</b>... ","bloggername":"나만의 블로그.","bloggerlink":"blog.naver.com/dokdo_han","postdate":"20101107"}]}
+  ```
+
+  
