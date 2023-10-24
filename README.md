@@ -46,7 +46,7 @@ http://localhost:9080/h2-console
 
 
 
-### 문제해결 전략
+### 개발방향
 
 
 
